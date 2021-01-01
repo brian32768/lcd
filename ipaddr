@@ -1,0 +1,11 @@
+#!/usr/bin/perl -w
+#
+#  ipaddr <dev>
+#  given a network device (eg 'eth0') output the ipv4 address
+#
+use strict;
+my $dev=shift;
+$dev =~ s/[\'\|\"\$]//g; # no funny business
+my $addr = `/sbin/ip addr show dev $dev`;
+$addr =~ /inet\ (\S+)\/\d\d/;
+print $1;

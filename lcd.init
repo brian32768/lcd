@@ -1,0 +1,28 @@
+#!/bin/sh
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+OPTIONS="server"
+
+case "$1" in
+    start)
+	echo -n "Starting lcd"
+	start-stop-daemon --start --quiet --exec /usr/sbin/lcd \
+		--background --pidfile /var/run/lcd.pid -- $OPTIONS
+	echo "."	
+    ;;
+
+    stop)
+	echo -n "Stopping lcd"
+	start-stop-daemon --stop --quiet --exec /usr/sbin/lcd \
+		--pidfile /var/run/lcd.pid
+	echo "."	
+    ;;
+
+    *)
+	echo "Usage: /etc/init.d/lcd {start|stop}" >&2
+	exit 1
+    ;;
+esac
+
+exit 0
