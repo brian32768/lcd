@@ -5,6 +5,8 @@ This supports the lcd display on a Toshiba Magnia.
 Original work by Hans-Michael Stahl, hms@web.de, fan control code by Eric Dube
 Updated and put on github by Brian Wilson <brian@wildsong.biz>
 
+2023/8/21 2.2.3 modified for whatever Linux Ray is using now.
+
 2021/1/1 Currently it's working on an SG30 running Debian 10.7
 
 I don't currently own one of these servers so I can't test it.

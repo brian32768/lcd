@@ -4,11 +4,6 @@
 /* see <Http://Www.Gnu.Org/Licenses/Gpl.Html> */
 /* Modified to run on Ubuntu 8.04LTS by RJR */
 
-#ifndef __i386__
-#  error "This program can't compile or run on non-intel computers"
-#endif
-
-
 #include <sys/types.h>
 #include <sys/select.h>
 #include <sys/sysinfo.h>
@@ -31,12 +26,16 @@
 #define OUTL(data, port) outl(data, port)
 #endif
 
-#include version.h
+#include "version.h"
 
 /* The LCD device */     
 #define LCDDEVICE "/dev/ttyS0"
 #define LINELEN 16
 #define BAUDRATE B9600
+
+/* The ETHERNET devices */
+#define ETH0 "/usr/local/sbin/ipaddr enp0s8"
+#define ETH1 "/usr/local/sbin/ipaddr enp0s9"
 
 #define CELSIUS    0
 #define FAHRENHEIT 1
@@ -60,7 +59,7 @@ int tempunit = CELSIUS;
 /* to change to values you like better */ 
  
 /* directory where to find lm86 information */
-static const char _SYSBASENAME_LM[] = "/sys/bus/i2c/drivers/lm80/0-002d/";
+//static const char _SYSBASENAME_LM[] = "/sys/bus/i2c/drivers/lm80/0-002d/";
 
 static const char _SYSTEMPINP[] = "temp1_input";
 static const char _SYSTEMPMAX[] = "temp1_max";
@@ -70,8 +69,8 @@ static const char _SYSTEMPMAX[] = "temp1_max";
 static const char _CPUTEMPINP[] = "temp2_input";	/* current temp */
 static const char _CPUTEMPMAX[] = "temp2_max";		/* max temp -> fan on */
 /* Internal CPU temperature (SBr)*/
-static const char _SBRTEMPINP[] = "temp3_input";	/* current temp */
-static const char _SBRTEMPMAX[] = "temp3_max";		/* max temp -> fan on */
+//static const char _SBRTEMPINP[] = "temp3_input";	/* current temp */
+//static const char _SBRTEMPMAX[] = "temp3_max";		/* max temp -> fan on */
 
 #define CPUTEMPHYST 8 /* hysteresis */
 
@@ -160,7 +159,7 @@ typedef enum {
   FANCTL,        /* allow fan control */
   DISKTEMPS,     /* show hard disk temperatures if supported by drive(s) */
   EXTADDR,       /* show ip address of connection (as seen on internet) */
-  LANADDR,       /* show ip addresses for eth0 and eth1 */
+  LANADDR,       /* show ip addresses for ETH0 and ETH1 */
   UPTIME,        /* show system uptime */
   FIREWALLCTL,   /* show status of firewall and allow toggling */
   WLANCTL        /* show status of wireless and allow toggling */   
@@ -666,7 +665,7 @@ static void server(int fd)
 	    case LANADDR:
 		/* show LAN (internal) address */
 		wait = 60*5; /* every 5 minutes */
-		f = popen("/usr/local/sbin/ipaddr eth0", "r");
+		f = popen(ETH0, "r");
 		n = fread(tmp1, 1, sizeof(tmp1), f);
 		pclose(f);
 		if (n > 0) {
@@ -675,7 +674,7 @@ static void server(int fd)
 		    strcpy(tmp1, "eth0 ???");
 		    wait = 10; /* bump test up to every 10 seconds */
 		}
-		f = popen("/usr/local/sbin/ipaddr eth1", "r");
+		f = popen(ETH1, "r");
 		n = fread(tmp2, 1, sizeof(tmp2), f);
 		pclose(f);
 		if (n > 0) {
@@ -796,7 +795,7 @@ int main(int argc, char **argv)
     struct termios oldtio, newtio;
 
 #if DEB
-    fprintf(stderr, "Starting...\n");
+    fprintf(stderr, "Starting version %s...\n", VERSION);
 #endif
     fd = open(LCDDEVICE, O_RDWR | O_NOCTTY ); 
     if (fd < 0) {
